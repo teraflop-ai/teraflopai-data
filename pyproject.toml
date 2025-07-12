@@ -19,17 +19,20 @@ classifiers = [
 ]
 dependencies = [
     "ray[data]>=2.47.1",
+    "transformers>=4.53.2",
 ]
 [project.optional-dependencies]
 text = [
     "warcio>=1.7.5",
     "trafilatura>=2.0.0",
+    "chonkie>=1.1.0",
+    "sentence-transformers>=5.0.0",
 ]
 audio = [
-
+    "silero-vad>=5.1.2",
 ]
 video = [
-
+    "scenedetect>=0.6.6",
 ]
 image = [
     "warcio>=1.7.5",
