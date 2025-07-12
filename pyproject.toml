@@ -1,0 +1,39 @@
+[project]
+name = "seidr-data"
+version = "0.1.0"
+description = "A petabyte scale data processing framework for AI models using Ray."
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [
+    {name = "Teraflop AI", email = "enrico@teraflop.ai"},
+]
+classifiers = [
+  "Typing :: Typed",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "ray[data]>=2.47.1",
+]
+[project.optional-dependencies]
+text = [
+    "warcio>=1.7.5",
+    "trafilatura>=2.0.0",
+]
+audio = [
+
+]
+video = [
+
+]
+image = [
+    "warcio>=1.7.5",
+]
+all = [
+    "seidr-data[text,audio,video,image]",  # Reference other extras
+]
