@@ -1,5 +1,5 @@
 [project]
-name = "seidr-data"
+name = "teraflopai-data"
 version = "0.1.0"
 description = "A petabyte scale data processing framework for AI models using Ray."
 readme = "README.md"
@@ -27,6 +27,7 @@ text = [
     "trafilatura>=2.0.0",
     "chonkie>=1.1.0",
     "sentence-transformers>=5.0.0",
+    "vllm>=0.9.2",
 ]
 audio = [
     "silero-vad>=5.1.2",
@@ -35,8 +36,9 @@ video = [
     "scenedetect>=0.6.6",
 ]
 image = [
+    "vllm>=0.9.2",
     "warcio>=1.7.5",
 ]
 all = [
-    "seidr-data[text,audio,video,image]",  # Reference other extras
+    "teraflopai-data[text,audio,video,image]",  # Reference other extras
 ]
