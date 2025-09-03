@@ -1,9 +1,8 @@
-import io
 from enum import Enum
 from typing import Optional
 
+import daft
 import imagehash
-from PIL import Image
 
 
 class HashingAlgorithm(str, Enum):
@@ -16,6 +15,7 @@ class HashingAlgorithm(str, Enum):
     CROP_RESISTANT = "crop_resistant"
 
 
+@daft.udf(return_dtype=daft.DataType.string())
 class ImageHasher:
     def __init__(
         self, hashing_algorithm: HashingAlgorithm, hash_size: Optional[int] = None
@@ -23,12 +23,10 @@ class ImageHasher:
         self.hashing_algorithm = hashing_algorithm
         self.hash_size = hash_size
 
-    def __call__(self, image: bytes | Image.Image) -> str:
-        if isinstance(image, bytes):
-            image = Image.open(io.BytesIO(image))
-        return str(self.hash_image(image))
+    def __call__(self, images):
+        return [self.hash_image(img) for img in images]
 
-    def hash_image(self, image: Image.Image):
+    def hash_image(self, image):
         """
         Args:
             hashing_algorithm: The selected image hashing algorithm to use
