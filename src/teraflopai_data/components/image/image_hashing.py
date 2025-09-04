@@ -16,7 +16,7 @@ class HashingAlgorithm(str, Enum):
 
 
 @daft.udf(return_dtype=daft.DataType.string())
-class ImageHasher:
+class ImageHasherUDF:
     def __init__(
         self, hashing_algorithm: HashingAlgorithm, hash_size: Optional[int] = None
     ):
@@ -54,3 +54,31 @@ class ImageHasher:
                 raise ValueError(
                     f"Please select a valide hashing algorithm: {self.hashing_algorithm}"
                 )
+
+class ImageHasher:
+    def __init__(
+        self, 
+        hashing_algorithm: HashingAlgorithm,
+        hash_size: Optional[int] = None,
+        concurrency: int | None = None,
+        num_cpus: int | None = None, 
+        num_gpus: int | None = None,
+
+    ):
+        self.hashing_algorithm = hashing_algorithm
+        self.hash_size = hash_size
+        self.concurrency = concurrency
+        self.num_gpus = num_gpus
+        self.num_cpus = num_cpus
+
+    def __call__(self, column):
+        return ImageHasherUDF.with_init_args(
+            hashing_algorithm = self.hashing_algorithm,
+            hash_size = self.hash_size
+        ).with_concurrency(
+            self.concurrency
+        ).override_options(
+            batch_size=self.batch_size,
+            num_gpus=self.num_gpus,
+            num_cpus=self.num_cpus,
+        )(column)
