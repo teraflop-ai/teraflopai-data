@@ -1,8 +1,10 @@
+import io
 from enum import Enum
 from typing import Optional
 
 import daft
 import imagehash
+from PIL import Image
 
 
 class HashingAlgorithm(str, Enum):
@@ -24,7 +26,7 @@ class ImageHasherUDF:
         self.hash_size = hash_size
 
     def __call__(self, images):
-        return [self.hash_image(img) for img in images]
+        return [self.hash_image(Image.open(io.BytesIO(img))) for img in images]
 
     def hash_image(self, image):
         """
@@ -52,33 +54,36 @@ class ImageHasherUDF:
                 return imagehash.crop_resistant_hash(image)
             case _:
                 raise ValueError(
-                    f"Please select a valide hashing algorithm: {self.hashing_algorithm}"
+                    f"Please select a valid hashing algorithm: {self.hashing_algorithm}"
                 )
+
 
 class ImageHasher:
     def __init__(
-        self, 
+        self,
         hashing_algorithm: HashingAlgorithm,
         hash_size: Optional[int] = None,
-        concurrency: int | None = None,
-        num_cpus: int | None = None, 
-        num_gpus: int | None = None,
-
+        batch_size: Optional[int] = None,
+        concurrency: Optional[int] = None,
+        num_cpus: Optional[int] = None,
+        num_gpus: Optional[int] = None,
     ):
         self.hashing_algorithm = hashing_algorithm
         self.hash_size = hash_size
+        self.batch_size = batch_size
         self.concurrency = concurrency
         self.num_gpus = num_gpus
         self.num_cpus = num_cpus
 
     def __call__(self, column):
-        return ImageHasherUDF.with_init_args(
-            hashing_algorithm = self.hashing_algorithm,
-            hash_size = self.hash_size
-        ).with_concurrency(
-            self.concurrency
-        ).override_options(
-            batch_size=self.batch_size,
-            num_gpus=self.num_gpus,
-            num_cpus=self.num_cpus,
-        )(column)
+        return (
+            ImageHasherUDF.with_init_args(
+                hashing_algorithm=self.hashing_algorithm, hash_size=self.hash_size
+            )
+            .with_concurrency(self.concurrency)
+            .override_options(
+                batch_size=self.batch_size,
+                num_gpus=self.num_gpus,
+                num_cpus=self.num_cpus,
+            )(column)
+        )
