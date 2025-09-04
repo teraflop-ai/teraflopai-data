@@ -83,7 +83,7 @@ class ImageHasher:
         self,
         hashing_algorithm: HashingAlgorithm,
         hash_size: Optional[int] = None,
-        input_column: str = "text",
+        input_column: str = None,
         output_column: Optional[str] = "image_hash",
         batch_size: Optional[int] = None,
         concurrency: Optional[int] = None,
