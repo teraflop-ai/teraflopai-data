@@ -3,6 +3,7 @@ from typing import Optional
 
 import daft
 import imagehash
+from daft import col
 from PIL import Image
 
 
@@ -82,6 +83,8 @@ class ImageHasher:
         self,
         hashing_algorithm: HashingAlgorithm,
         hash_size: Optional[int] = None,
+        input_column: str = "text",
+        output_column: Optional[str] = "image_hash",
         batch_size: Optional[int] = None,
         concurrency: Optional[int] = None,
         num_cpus: Optional[int] = None,
@@ -89,14 +92,16 @@ class ImageHasher:
     ):
         self.hashing_algorithm = hashing_algorithm
         self.hash_size = hash_size
+        self.input_column = input_column
+        self.output_column = output_column
         self.batch_size = batch_size
         self.concurrency = concurrency
         self.num_gpus = num_gpus
         self.num_cpus = num_cpus
 
-    def __call__(self, column):
-        """Apply the image hasher UDF to a column."""
-        hasher_udf = create_image_hasher_udf(
+    def __call__(self, df: daft.DataFrame) -> daft.DataFrame:
+        """Apply the image hasher UDF to the dataframe."""
+        processor = create_image_hasher_udf(
             hashing_algorithm=self.hashing_algorithm,
             hash_size=self.hash_size,
             batch_size=self.batch_size,
@@ -104,4 +109,5 @@ class ImageHasher:
             num_cpus=self.num_cpus,
             num_gpus=self.num_gpus,
         )
-        return hasher_udf(column)
+        df = df.with_column(self.output_column, processor(col(self.input_column)))
+        return df
