@@ -26,7 +26,7 @@ def create_finewebedu_udf(
             self,
             model_name: str = model_name,
             device: str = "cuda",
-            torch_dtype: torch.dtype = torch.bfloat16,
+            dtype: torch.dtype = torch.bfloat16,
             attn_implementation: str = "sdpa",
         ):
             from transformers import AutoModelForSequenceClassification, AutoTokenizer
@@ -37,7 +37,7 @@ def create_finewebedu_udf(
 
             self.model = AutoModelForSequenceClassification.from_pretrained(
                 model_name,
-                torch_dtype=torch_dtype,
+                dtype=dtype,
                 attn_implementation=attn_implementation,
             ).to(self.device)
             self.model.compile()
