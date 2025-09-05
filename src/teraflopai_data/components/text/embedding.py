@@ -4,9 +4,10 @@ import daft
 import numpy as np
 import torch
 from daft import DataType
+from loguru import logger
 
 from src.teraflopai_data.components.distributed_base import Distributed
-from loguru import logger
+
 
 def create_sentence_transformer_udf(
     model_name: str,
@@ -72,7 +73,7 @@ def create_sentence_transformer_udf(
             return embeddings
 
     return SentenceTransformersUDF.with_init_args(
-        model_name=model_name, 
+        model_name=model_name,
         max_seq_length=max_seq_length,
         batch_size=batch_size,
     )
