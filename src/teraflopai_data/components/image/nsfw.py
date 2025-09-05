@@ -4,6 +4,7 @@ import daft
 import torch
 from daft import DataType
 from PIL import Image
+
 from src.teraflopai_data.components.distributed_base import Distributed
 
 
@@ -28,20 +29,26 @@ def create_falcon_nsfw_udf(
             device: str = "cuda",
         ):
             from transformers import AutoImageProcessor, AutoModelForImageClassification
-            
+
             self.device = device
 
             self.processor = AutoImageProcessor.from_pretrained(model_name)
-            self.model = AutoModelForImageClassification.from_pretrained(model_name).to(self.device)
+            self.model = AutoModelForImageClassification.from_pretrained(model_name).to(
+                self.device
+            )
             self.model.compile()
             self.model.eval()
 
         def __call__(self, images: daft.DataFrame) -> daft.DataFrame:
-            inputs = self.processor(images=[Image.fromarray(img) for img in images], return_tensors="pt").to(self.device)
+            inputs = self.processor(
+                images=[Image.fromarray(img) for img in images], return_tensors="pt"
+            ).to(self.device)
             with torch.no_grad():
                 outputs = self.model(**inputs).logits
             predicted_labels = outputs.argmax(-1)
-            scores = [self.model.config.id2label[p.cpu().item()] for p in predicted_labels]
+            scores = [
+                self.model.config.id2label[p.cpu().item()] for p in predicted_labels
+            ]
             return daft.Series.from_pylist(scores)
 
     return FalconsNSFWUDF.with_init_args(
