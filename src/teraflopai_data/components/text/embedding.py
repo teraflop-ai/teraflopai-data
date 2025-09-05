@@ -3,7 +3,7 @@ from typing import Optional
 import daft
 import numpy as np
 import torch
-from daft import DataType, col
+from daft import DataType
 
 from src.teraflopai_data.components.distributed_base import Distributed
 
@@ -78,7 +78,7 @@ class SentenceTransformersEmbed(Distributed):
     def __init__(
         self,
         model_name: str,
-        batch_size: int,
+        batch_size: int = 1,
         input_column: str = None,
         output_column: Optional[str] = "text_embedding",
         concurrency: Optional[int] = None,
