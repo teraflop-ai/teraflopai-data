@@ -3,8 +3,9 @@ from typing import Optional
 
 import daft
 import imagehash
-from daft import col
 from PIL import Image
+
+from src.teraflopai_data.components.distributed_base import Distributed
 
 
 class HashingAlgorithm(str, Enum):
@@ -78,7 +79,7 @@ def create_image_hasher_udf(
     )
 
 
-class ImageHasher:
+class ImageHasher(Distributed):
     def __init__(
         self,
         hashing_algorithm: HashingAlgorithm,
@@ -92,16 +93,18 @@ class ImageHasher:
     ):
         self.hashing_algorithm = hashing_algorithm
         self.hash_size = hash_size
-        self.input_column = input_column
-        self.output_column = output_column
-        self.batch_size = batch_size
-        self.concurrency = concurrency
-        self.num_gpus = num_gpus
-        self.num_cpus = num_cpus
+        super().__init__(
+            input_column=input_column,
+            output_column=output_column,
+            batch_size=batch_size,
+            concurrency=concurrency,
+            num_cpus=num_cpus,
+            num_gpus=num_gpus,
+        )
 
-    def __call__(self, df: daft.DataFrame) -> daft.DataFrame:
+    def _udf(self):
         """Apply the image hasher UDF to the dataframe."""
-        processor = create_image_hasher_udf(
+        return create_image_hasher_udf(
             hashing_algorithm=self.hashing_algorithm,
             hash_size=self.hash_size,
             batch_size=self.batch_size,
@@ -109,5 +112,3 @@ class ImageHasher:
             num_cpus=self.num_cpus,
             num_gpus=self.num_gpus,
         )
-        df = df.with_column(self.output_column, processor(col(self.input_column)))
-        return df

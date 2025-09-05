@@ -5,6 +5,8 @@ import numpy as np
 import torch
 from daft import DataType, col
 
+from src.teraflopai_data.components.distributed_base import Distributed
+
 
 def create_sentence_transformer_udf(
     model_name: str,
@@ -72,7 +74,7 @@ def create_sentence_transformer_udf(
     )
 
 
-class SentenceTransformers:
+class SentenceTransformersEmbed(Distributed):
     def __init__(
         self,
         model_name: str,
@@ -84,20 +86,20 @@ class SentenceTransformers:
         num_gpus: Optional[int] = None,
     ):
         self.model_name = model_name
-        self.input_column = input_column
-        self.output_column = output_column
-        self.batch_size = batch_size
-        self.concurrency = concurrency
-        self.num_gpus = num_gpus
-        self.num_cpus = num_cpus
+        super().__init__(
+            input_column=input_column,
+            output_column=output_column,
+            batch_size=batch_size,
+            concurrency=concurrency,
+            num_cpus=num_cpus,
+            num_gpus=num_gpus,
+        )
 
-    def __call__(self, df: daft.DataFrame) -> daft.DataFrame:
-        processor = create_sentence_transformer_udf(
+    def _udf(self):
+        return create_sentence_transformer_udf(
             model_name=self.model_name,
             batch_size=self.batch_size,
             concurrency=self.concurrency,
             num_cpus=self.num_cpus,
             num_gpus=self.num_gpus,
         )
-        df = df.with_column(self.output_column, processor(col(self.input_column)))
-        return df
