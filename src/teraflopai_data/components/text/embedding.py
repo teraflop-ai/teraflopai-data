@@ -6,10 +6,11 @@ import torch
 from daft import DataType
 
 from src.teraflopai_data.components.distributed_base import Distributed
-
+from loguru import logger
 
 def create_sentence_transformer_udf(
     model_name: str,
+    max_seq_length: Optional[int] = None,
     batch_size: Optional[int] = None,
     concurrency: Optional[int] = None,
     num_cpus: Optional[int] = None,
@@ -29,10 +30,9 @@ def create_sentence_transformer_udf(
             batch_size: int = batch_size,
             device: str = "cuda",
             convert_to_tensor: bool = False,
-            torch_dtype: torch.dtype = torch.bfloat16,
+            dtype: torch.dtype = torch.bfloat16,
             attn_implementation: str = "sdpa",
-            set_seq_len: bool = True,
-            max_seq_length: Optional[int] = None,
+            max_seq_length: Optional[int] = max_seq_length,
             token: str = None,
             show_progress_bar: bool = False,
         ):
@@ -43,12 +43,14 @@ def create_sentence_transformer_udf(
                 device=device,
                 token=token,
                 model_kwargs={
-                    "torch_dtype": torch_dtype,
+                    "dtype": dtype,
                     "attn_implementation": attn_implementation,
                 },
             )
+            self.model = torch.compile(self.model)
 
-            if set_seq_len:
+            if max_seq_length is not None:
+                logger.info(f"Max sequence length is set to: {max_seq_length}")
                 self.model.max_seq_length = max_seq_length
 
             self.convert_to_tensor = convert_to_tensor
@@ -70,7 +72,9 @@ def create_sentence_transformer_udf(
             return embeddings
 
     return SentenceTransformersUDF.with_init_args(
-        model_name=model_name, batch_size=batch_size
+        model_name=model_name, 
+        max_seq_length=max_seq_length,
+        batch_size=batch_size,
     )
 
 
@@ -78,6 +82,7 @@ class SentenceTransformersEmbed(Distributed):
     def __init__(
         self,
         model_name: str,
+        max_seq_length: Optional[int] = None,
         batch_size: int = 1,
         input_column: str = None,
         output_column: Optional[str] = "text_embedding",
@@ -86,6 +91,7 @@ class SentenceTransformersEmbed(Distributed):
         num_gpus: Optional[int] = None,
     ):
         self.model_name = model_name
+        self.max_seq_length = max_seq_length
         super().__init__(
             input_column=input_column,
             output_column=output_column,
@@ -98,6 +104,7 @@ class SentenceTransformersEmbed(Distributed):
     def _udf(self):
         return create_sentence_transformer_udf(
             model_name=self.model_name,
+            max_seq_length=self.max_seq_length,
             batch_size=self.batch_size,
             concurrency=self.concurrency,
             num_cpus=self.num_cpus,

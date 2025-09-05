@@ -49,7 +49,7 @@ def create_falcon_nsfw_udf(
             scores = [
                 self.model.config.id2label[p.cpu().item()] for p in predicted_labels
             ]
-            return daft.Series.from_pylist(scores)
+            return scores
 
     return FalconsNSFWUDF.with_init_args(
         model_name=model_name,

@@ -56,8 +56,7 @@ def create_finewebedu_udf(
                 logits = outputs.logits.squeeze(-1).float().cpu().numpy()
 
             scores = [int(round(max(0, min(score, 5)))) for score in logits]
-
-            return daft.Series.from_pylist(scores)
+            return scores
 
     return FinewebEduUDF.with_init_args(
         model_name=model_name,

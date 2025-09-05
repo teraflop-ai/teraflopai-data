@@ -54,7 +54,7 @@ def create_owl_watermark_udf(
             probs = F.softmax(logits, dim=1)
             predictions = torch.argmax(probs.cpu(), dim=1)
             scores = [pred.item() == 1 for pred in predictions]
-            return daft.Series.from_pylist(scores)
+            return scores
 
         def processor(self, image: Image.Image):
             big_side = max(image.size)
