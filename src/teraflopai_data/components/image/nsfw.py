@@ -3,7 +3,6 @@ from typing import Optional
 import daft
 import torch
 from daft import DataType
-from PIL import Image
 
 from teraflopai_data.components.distributed_base import Distributed
 
@@ -32,7 +31,9 @@ def create_falcon_nsfw_udf(
 
             self.device = device
 
-            self.processor = AutoImageProcessor.from_pretrained(model_name)
+            self.processor = AutoImageProcessor.from_pretrained(
+                model_name, use_fast=True
+            )
             self.model = AutoModelForImageClassification.from_pretrained(model_name).to(
                 self.device
             )
@@ -40,9 +41,9 @@ def create_falcon_nsfw_udf(
             self.model.eval()
 
         def __call__(self, images: daft.DataFrame) -> daft.DataFrame:
-            inputs = self.processor(
-                images=[Image.fromarray(img) for img in images], return_tensors="pt"
-            ).to(self.device)
+            inputs = self.processor(images=images.to_pylist(), return_tensors="pt").to(
+                self.device
+            )
             with torch.no_grad():
                 outputs = self.model(**inputs).logits
             predicted_labels = outputs.argmax(-1)
