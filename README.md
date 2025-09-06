@@ -11,8 +11,11 @@ Install specific multimodal components
 # Image
 uv pip install teraflopai-data[image]
 
-# Test
+# Text
 uv pip install teraflopai-data[text]
+
+# Everything
+uv pip install teraflopai-data[all]
 ```
 
 ## Community
