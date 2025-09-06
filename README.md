@@ -4,8 +4,19 @@ A petabyte scale data processing framework for AI models using Daft + Ray.
 
 ## Installation
 ```python
-pip install teraflopai-data
+uv pip install teraflopai-data
 ```
+Install specific multimodal components
+```python
+# Image
+uv pip install teraflopai-data[image]
+
+# Test
+uv pip install teraflopai-data[text]
+```
+
+## Community
+[Join our Discord community](https://discord.gg/Fh4DfwQGhd)
 
 ## Examples
 
