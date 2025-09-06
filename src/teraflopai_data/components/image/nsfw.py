@@ -5,7 +5,7 @@ import torch
 from daft import DataType
 from PIL import Image
 
-from src.teraflopai_data.components.distributed_base import Distributed
+from teraflopai_data.components.distributed_base import Distributed
 
 
 def create_falcon_nsfw_udf(

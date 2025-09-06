@@ -6,7 +6,7 @@ import torch
 from daft import DataType
 from loguru import logger
 
-from src.teraflopai_data.components.distributed_base import Distributed
+from teraflopai_data.components.distributed_base import Distributed
 
 
 def create_sentence_transformer_udf(
@@ -44,7 +44,7 @@ def create_sentence_transformer_udf(
                 device=device,
                 token=token,
                 model_kwargs={
-                    "dtype": dtype,
+                    "torch_dtype": dtype,
                     "attn_implementation": attn_implementation,
                 },
             )

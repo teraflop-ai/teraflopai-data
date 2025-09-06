@@ -4,7 +4,7 @@ import daft
 from daft import DataType
 from PIL import Image
 
-from src.teraflopai_data.components.distributed_base import Distributed
+from teraflopai_data.components.distributed_base import Distributed
 
 CAPTION = """\
 <|im_start|>system\nYou are a helpful assistant.<|im_end|>\n\

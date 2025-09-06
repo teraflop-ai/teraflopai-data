@@ -7,8 +7,8 @@ import torchvision.transforms.functional as TVF
 from daft import DataType
 from PIL import Image
 
-from src.teraflopai_data.components.distributed_base import Distributed
-from src.teraflopai_data.models.owl_watermark import DetectorModelOwl
+from teraflopai_data.components.distributed_base import Distributed
+from teraflopai_data.models.owl_watermark import DetectorModelOwl
 
 
 def create_owl_watermark_udf(

@@ -17,7 +17,7 @@ classifiers = [
   "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 dependencies = [
-    "daft[ray]>=0.5.22",
+    "daft[lance,ray]>=0.5.22",
     "loguru>=0.7.3",
     "ray[data]>=2.47.1",
     "transformers<4.54.0",

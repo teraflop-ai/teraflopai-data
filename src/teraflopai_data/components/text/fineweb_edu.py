@@ -4,7 +4,7 @@ import daft
 import torch
 from daft import DataType
 
-from src.teraflopai_data.components.distributed_base import Distributed
+from teraflopai_data.components.distributed_base import Distributed
 
 
 def create_finewebedu_udf(
@@ -37,7 +37,7 @@ def create_finewebedu_udf(
 
             self.model = AutoModelForSequenceClassification.from_pretrained(
                 model_name,
-                dtype=dtype,
+                torch_dtype=dtype,
                 attn_implementation=attn_implementation,
             ).to(self.device)
             self.model.compile()
