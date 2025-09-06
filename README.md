@@ -7,13 +7,15 @@ A petabyte scale data processing framework for AI models using Daft + Ray.
 pip install teraflopai-data
 ```
 
+## Examples
+
 ### Pipeline
 ```python
 import daft
 
-from src.teraflopai_data.components.text.embedding import SentenceTransformersEmbed
-from src.teraflopai_data.components.text.fineweb_edu import FinewebEduClassifier
-from src.teraflopai_data.pipeline import Pipeline
+from teraflopai_data.components.text.embedding import SentenceTransformersEmbed
+from teraflopai_data.components.text.fineweb_edu import FinewebEduClassifier
+from teraflopai_data.pipeline import Pipeline
 
 df = daft.from_pydict(
     {
@@ -52,15 +54,39 @@ df.show()
 ```
 
 ### Text
+```python
+import daft
+
+from teraflopai_data.components.text.fineweb_edu import FinewebEduClassifier
+
+df = daft.from_pydict(
+    {
+        "text": [
+            "My mother told me",
+            "Someday I will buy",
+            "Galleys with good oars",
+            "Sail to distant shores",
+        ],
+    }
+)
+
+classifier = FinewebEduClassifier(
+    input_column="text",
+    batch_size=4,
+    concurrency=1,
+    num_cpus=6,
+    num_gpus=1,
+)
+df = classifier(df)
+df.show()
+```
 
 ### Image
-
-Image Hashing
 ```python
 import daft
 from daft import col
 
-from src.teraflopai_data.components.image.image_hashing import ImageHasher
+from teraflopai_data.components.image.image_hashing import ImageHasher
 
 df = daft.from_pydict(
     {
@@ -87,7 +113,3 @@ df = hasher(df)
 df = df.drop_duplicates("image_hash")
 df.show()
 ```
-### Video
-
-## Slurm
-
