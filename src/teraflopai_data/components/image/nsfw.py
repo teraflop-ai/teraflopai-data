@@ -16,7 +16,7 @@ def create_falcon_nsfw_udf(
     num_gpus: Optional[int] = None,
 ):
     @daft.udf(
-        return_dtype=DataType.string(),
+        return_dtype=DataType.int8(),
         concurrency=concurrency,
         num_cpus=num_cpus,
         num_gpus=num_gpus,
@@ -46,9 +46,7 @@ def create_falcon_nsfw_udf(
             with torch.no_grad():
                 outputs = self.model(**inputs).logits
             predicted_labels = outputs.argmax(-1)
-            scores = [
-                self.model.config.id2label[p.cpu().item()] for p in predicted_labels
-            ]
+            scores = [p.cpu().item() for p in predicted_labels]
             return scores
 
     return FalconsNSFWUDF.with_init_args(
