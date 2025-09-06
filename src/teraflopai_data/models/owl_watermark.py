@@ -24,7 +24,7 @@ class DetectorModelOwl(nn.Module):
         self.linear2 = nn.Linear(n_hidden * 2, 2)
 
     def forward(self, pixel_values: torch.Tensor):
-        with torch.autocast("cuda", dtype=torch.bfloat16):
+        with torch.autocast("cuda", dtype=torch.float16):
             outputs = self.owl(pixel_values=pixel_values, output_hidden_states=True)
             x = outputs.last_hidden_state
             x = self.dropout1(x)

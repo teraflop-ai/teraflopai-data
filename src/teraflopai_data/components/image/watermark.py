@@ -33,7 +33,7 @@ def create_owl_watermark_udf(
         ):
             self.device = device
 
-            self.model = DetectorModelOwl(model_name)
+            self.model = DetectorModelOwl(model_name, dropout=0.0)
             self.model.load_state_dict(
                 torch.hub.load_state_dict_from_url(
                     "https://huggingface.co/TeraflopAI/owl-watermark-joycaption/resolve/main/far5y1y5-8000.pt",
@@ -53,7 +53,7 @@ def create_owl_watermark_udf(
                 (logits,) = self.model(input_images)
             probs = F.softmax(logits, dim=1)
             predictions = torch.argmax(probs.cpu(), dim=1)
-            scores = [pred.item() == 1 for pred in predictions]
+            scores = [pred.item() for pred in predictions]
             return scores
 
         def processor(self, image: Image.Image):
